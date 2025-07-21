@@ -1,11 +1,14 @@
 package com.table2table.userservice.security;
 
+import com.table2table.security.config.CommonSecurityBeans;
+import com.table2table.security.filter.JwtAuthFilter;
+import com.table2table.security.service.IUserDetailsService;
 import com.table2table.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +28,10 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     private final UserRepository userRepository;
+
+    private final IUserDetailsService customUserDetailsService;
+
+    private final CommonSecurityBeans commonSecurityBeans;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,8 +53,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService((customUserDetailsService)); // this must be injected
+        provider.setPasswordEncoder(commonSecurityBeans.passwordEncoder());
+        return provider;
     }
 
 
