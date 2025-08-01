@@ -4,6 +4,7 @@ package com.table2table.userservice.controller;
 import com.table2table.userservice.dto.RegisterRequestDto;
 import com.table2table.userservice.dto.UserResponseDto;
 import com.table2table.userservice.entity.User;
+import com.table2table.userservice.repository.UserRepository;
 import com.table2table.userservice.service.UserManagementService;
 import com.table2table.userservice.util.UserManagementUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.Optional;
 public class UserController {
 
     private final UserManagementService userManagementService;
+    private final UserRepository userRepository;
 
     //persist to db
     @PostMapping("/register")
@@ -44,10 +46,23 @@ public class UserController {
     }
 
     // Admin or owner: Get specific user
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.userId")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.credId")
     @GetMapping("getUser/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         Optional<User> userOptional = userManagementService.getUserById(id);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserResponseDto userResponse = UserManagementUtil.convertToDto(userOptional.get());
+        return ResponseEntity.ok(userResponse);
+    }
+
+
+    @GetMapping("getUserByEmail/{email}")
+    public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();

@@ -19,6 +19,7 @@ public class UserManagementUtil {
         dto.setFlatNumber(user.getFlatNumber());
         dto.setFloor(user.getFloor());
         dto.setRole(user.getRole());
+        dto.setCredId(user.getCredId());
         return dto;
     }
 
