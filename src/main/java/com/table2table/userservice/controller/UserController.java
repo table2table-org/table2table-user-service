@@ -46,7 +46,7 @@ public class UserController {
     }
 
     // Admin or owner: Get specific user
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.credId")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
     @GetMapping("getUser/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         Optional<User> userOptional = userManagementService.getUserById(id);
@@ -73,7 +73,7 @@ public class UserController {
     }
 
     // Admin or owner: Update user
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.credId")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
     @PutMapping("update/{id}")
     public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable Long id,
